@@ -563,7 +563,7 @@ public extension UIViewController {
     }
     
     /// 可拖动改变高度的控件
-    private var dragableViews:[DragableView] {
+    var dragableViews:[DragableView] {
         get {
             var views:[DragableView]? = objc_getAssociatedObject(self, &DragableAssociatedKeys.dragViewKey) as? [DragableView]
             if views == nil {
