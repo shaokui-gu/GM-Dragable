@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "GM+Dragable"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "A DragableView extension for GM"
   s.homepage     = "https://github.com/shaokui-gu/GM-Dragable"
   s.license      = 'MIT'
