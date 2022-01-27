@@ -85,43 +85,43 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     private var isKeyboardShow = false
     
     /// 显示后调用
-    var onShow:VoidCallBack?
+    public var onShow:VoidCallBack?
     
     /// dismiss后调用
-    var onDismiss:VoidCallBack?
+    public var onDismiss:VoidCallBack?
     
     /// 是否显示背景阴影
-    var showBackgroundShadow:Bool = false {
+    public var showBackgroundShadow:Bool = false {
         didSet {
             backgroundLayer.isHidden = !showBackgroundShadow
         }
     }
     
     /// 键盘高度
-    var keyboardHeight:CGFloat = 0
+    private var keyboardHeight:CGFloat = 0
 
     /// 不允许手势关闭
-    var disableGestureClose:Bool = false
+    public var disableGestureClose:Bool = false
     
     /// 发生手势冲突的scrollView
     private var simultaneouslyScrollView:UIScrollView? = nil
         
     /// indicator backgroundColor
-    var indicatorColor:UIColor = UIColor(red: 241 / 255, green: 243 / 255, blue: 245 / 255, alpha: 1) {
+    public var indicatorColor:UIColor = UIColor(red: 241 / 255, green: 243 / 255, blue: 245 / 255, alpha: 1) {
         didSet {
             indicatorView.backgroundColor = indicatorColor
         }
     }
     
     /// background shadowColor
-    var backgroundShadowColor:UIColor = UIColor(red: 233 / 255, green: 236 / 255, blue: 239 / 255, alpha: 1) {
+    public var backgroundShadowColor:UIColor = UIColor(red: 233 / 255, green: 236 / 255, blue: 239 / 255, alpha: 1) {
         didSet {
             backgroundLayer.shadowColor = backgroundShadowColor.cgColor
         }
     }
 
     /// 背景
-    lazy var backgroundLayer:CALayer = {
+    lazy private var backgroundLayer:CALayer = {
         let layer =  CALayer()
         layer.cornerRadius =  16
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -141,14 +141,14 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     }()
     
     /// 是否允许拖拽
-    var dragEnabled = true {
+    public var dragEnabled = true {
         didSet {
             pan.isEnabled = dragEnabled
         }
     }
     
     /// 当前内容高度
-    var contentHeight:CGFloat  = 462 {
+    public var contentHeight:CGFloat  = 462 {
         didSet {
             contentView.snp.updateConstraints { maker in
                 maker.height.equalTo(contentHeight)
@@ -158,7 +158,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     }
     
     /// 根视图控制器
-    var rootViewController:UIViewController? {
+    public var rootViewController:UIViewController? {
         didSet {
             if let newVc = rootViewController {
                 viewControllers = [newVc]
@@ -175,11 +175,11 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    let passthroughView:UIView?
+    public let passthroughView:UIView?
 
-    weak var delegate:DragableViewDelegate?
+    open weak var delegate:DragableViewDelegate?
     
-    init(frame: CGRect, backgroundColor:UIColor, passthroughView:UIView?) {
+    public init(frame: CGRect, backgroundColor:UIColor, passthroughView:UIView?) {
         self.passthroughView = passthroughView
         super.init(frame: frame)
         self.backgroundColor = backgroundColor
@@ -201,7 +201,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         addGestureRecognizer(pan)
     }
     
-    open override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -340,7 +340,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    override public func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         
         guard self.contentHeight != maxHeight else {
             return super.hitTest(point, with: event)
@@ -360,7 +360,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     /// 是否响应手势
     /// - Parameter gestureRecognizer: 手势
     /// - Returns: 是否响应
-    open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if let pan = gestureRecognizer as? UIPanGestureRecognizer{
             let position = gestureRecognizer.location(in: self)
             var frame = indicatorView.frame
@@ -396,7 +396,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     
     /// 显示动画
     /// - Parameter contentHeight: 内容初始高度
-    func show(_ contentHeight:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat = (GM.windowSize.height - GM.safeArea.top - 26)) {
+    public func show(_ contentHeight:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat = (GM.windowSize.height - GM.safeArea.top - 26)) {
         if isAnimating {
             return
         }
@@ -414,7 +414,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    func transitionToMaxHeight() {
+    public func transitionToMaxHeight() {
         UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 0.95, initialSpringVelocity: 12, options: .curveEaseInOut, animations: {
             self.contentHeight = self.maxHeight
         }) { finished in
@@ -422,7 +422,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    func transitionToMinHeight() {
+    public func transitionToMinHeight() {
         UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 0.95, initialSpringVelocity: 12, options: .curveEaseInOut, animations: {
             self.contentHeight = self.initialContentHeight
         }) { finished in
@@ -430,7 +430,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    func updateDragableHeight(contentHeight:CGFloat, maxHeight:CGFloat = (GM.windowSize.height - GM.safeArea.top - 26), animated:Bool = true) {
+    public func updateDragableHeight(contentHeight:CGFloat, maxHeight:CGFloat = (GM.windowSize.height - GM.safeArea.top - 26), animated:Bool = true) {
         guard !self.contentView.prepareDestroy else {
             return
         }
@@ -445,7 +445,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     }
 
     /// 隐藏关闭
-    func dismiss() {
+    public func dismiss() {
         if isAnimating {
             return
         }
@@ -466,7 +466,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     /// - Parameters:
     ///   - touches: touch列表
     ///   - event: 事件
-    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let positon = touches.first?.location(in: self) ?? .zero
         let rect = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.contentView.frame.minY - 40)
         if rect.contains(positon) {

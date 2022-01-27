@@ -28,7 +28,7 @@ let package = Package(
             path: "Sources"
         ),
         .testTarget(
-            name: "GM+DragableTests",
+            name: "GM_DragableTests",
             dependencies: ["GM+Dragable"]),
     ]
 )
