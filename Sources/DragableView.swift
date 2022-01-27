@@ -365,7 +365,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
             let position = gestureRecognizer.location(in: self)
             var frame = indicatorView.frame
             let velocity = pan.velocity(in: self)
-            guard abs(velocity.y) >= 30 else {
+            guard abs(velocity.x) < abs(velocity.y) else {
                 return false
             }
             if velocity.y > 0 {
