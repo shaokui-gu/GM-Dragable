@@ -386,6 +386,9 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if otherGestureRecognizer.view is UIScrollView {
             let scrollView = otherGestureRecognizer.view as! UIScrollView
+            guard scrollView.contentSize.width <= scrollView.frame.width else {
+                return false
+            }
             if (scrollView.contentOffset.y <= 0 && scrollView.panGestureRecognizer.velocity(in: scrollView).y > 0) || (self.contentHeight < maxHeight && scrollView.panGestureRecognizer.velocity(in: scrollView).y < 0) {
                 self.simultaneouslyScrollView = scrollView
                 return true
