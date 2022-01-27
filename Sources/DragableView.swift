@@ -11,7 +11,7 @@ import SwiftUI
 import GM
 import SnapKit
 
-@objc protocol DragableViewDelegate {
+@objc public protocol DragableViewDelegate {
     @objc optional func dragableView(_ dragableView:DragableView, didUpdateDragable height:CGFloat) -> Void
     @objc optional func dragableViewWillMoveToMaxHeight(_ dragableView:DragableView) -> Void
     @objc optional func dragableViewWillMoveToMinHeight(_ dragableView:DragableView) -> Void
@@ -24,7 +24,7 @@ import SnapKit
     @objc optional func dragableViewDidAppear(_ dragableView:DragableView) -> Void
 }
 
-class DragableView: UIView, UIGestureRecognizerDelegate {
+open class DragableView: UIView, UIGestureRecognizerDelegate {
     class DragableContentView : UIView {
         var prepareDestroy:Bool = false
         override func layoutSubviews() {
@@ -201,7 +201,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
         addGestureRecognizer(pan)
     }
     
-    override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -212,7 +212,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -340,7 +340,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         
         guard self.contentHeight != maxHeight else {
             return super.hitTest(point, with: event)
@@ -360,7 +360,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
     /// 是否响应手势
     /// - Parameter gestureRecognizer: 手势
     /// - Returns: 是否响应
-    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if let pan = gestureRecognizer as? UIPanGestureRecognizer{
             let position = gestureRecognizer.location(in: self)
             var frame = indicatorView.frame
@@ -380,7 +380,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
     ///   - gestureRecognizer: 手势1
     ///   - otherGestureRecognizer: 其他手势
     /// - Returns: 是否支持多手势响应
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if otherGestureRecognizer.view is UIScrollView {
             let scrollView = otherGestureRecognizer.view as! UIScrollView
             if scrollView.contentSize == scrollView.frame.size || scrollView.contentSize.width > scrollView.frame.width {
@@ -466,7 +466,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
     /// - Parameters:
     ///   - touches: touch列表
     ///   - event: 事件
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let positon = touches.first?.location(in: self) ?? .zero
         let rect = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.contentView.frame.minY - 40)
         if rect.contains(positon) {
@@ -489,7 +489,7 @@ class DragableView: UIView, UIGestureRecognizerDelegate {
 
 
 /// 路由相关
-extension GM {
+public extension GM {
         
     static func showDragableFragment(_ name:String, params:[String : Any]? = nil, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
         try? (fromPage ?? GM.topPage())?.showDragableFragment(name, params: params, backgroundColor:backgroundColor, showShadow: showShadow, disableGestureClose: disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
@@ -500,7 +500,7 @@ extension GM {
     }
 }
 
-extension Router.Page {
+public extension Router.Page {
     
     func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
@@ -515,7 +515,7 @@ extension Router.Page {
     }
 }
 
-extension GMSwiftUIPageController {
+public extension GMSwiftUIPageController {
     func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
@@ -529,7 +529,7 @@ extension GMSwiftUIPageController {
     }
 }
 
-extension UIViewController {
+public extension UIViewController {
     func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
@@ -548,7 +548,7 @@ extension UIViewController {
     }
 }
 
-extension GM {
+public extension GM {
     static let AppleLoginLogPrefix = "【APPLE LOGIN】:"
     static let ApnsLogPrefix = "【APNS】:"
     static let CalendarLogPrefix = "【CALENDAR】:"
@@ -556,14 +556,14 @@ extension GM {
     static let TracingLogPrefix = "【TRACKING EVENT】:"
 }
 
-extension UIViewController {
+public extension UIViewController {
     
     private struct DragableAssociatedKeys {
         static var dragViewKey = "DragViewKey"
     }
     
     /// 可拖动改变高度的控件
-    var dragableViews:[DragableView] {
+    private var dragableViews:[DragableView] {
         get {
             var views:[DragableView]? = objc_getAssociatedObject(self, &DragableAssociatedKeys.dragViewKey) as? [DragableView]
             if views == nil {
