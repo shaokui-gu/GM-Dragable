@@ -502,6 +502,10 @@ public extension GM {
 
 public extension Router.Page {
     
+    var isShowingDragableView:Bool {
+        return self.controller?.isShowingDragableView ?? false
+    }
+    
     func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
@@ -560,6 +564,10 @@ public extension UIViewController {
     
     private struct DragableAssociatedKeys {
         static var dragViewKey = "DragViewKey"
+    }
+    
+    var isShowingDragableView:Bool {
+        return dragableViews.count > 0
     }
     
     /// 可拖动改变高度的控件
