@@ -121,7 +121,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     }
 
     /// 背景
-    lazy private var backgroundLayer:CALayer = {
+    public lazy var backgroundLayer:CALayer = {
         let layer =  CALayer()
         layer.cornerRadius =  16
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
