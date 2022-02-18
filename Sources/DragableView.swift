@@ -560,6 +560,35 @@ public extension GM {
     static let TracingLogPrefix = "【TRACKING EVENT】:"
 }
 
+public extension DragableView {
+    
+    /// push new
+    func toNamed(_ name:String, id:AnyHashable? = nil, params:[String : Any]? = nil, animated:Bool? = nil, completion:VoidCallBack? = nil) throws -> Void {
+        guard let navigation = self.rootViewController as? UINavigationController else {
+            return
+        }
+        let routePage = GM.routePageFor(name)
+        guard let routePage = routePage else {
+            throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
+        }
+        
+        let viewController = routePage.page(params)
+        navigation.pushViewController(viewController, animated: animated ?? routePage.animated)
+        completion?()
+    }
+    
+    func back(_ root:Bool = false, animated:Bool = false) {
+        guard let navigation = self.rootViewController as? UINavigationController else {
+            return
+        }
+        if root {
+            navigation.popToRootViewController(animated: animated)
+        } else {
+            navigation.popViewController(animated: animated)
+        }
+    }
+}
+
 public extension UIViewController {
     
     private struct DragableAssociatedKeys {
