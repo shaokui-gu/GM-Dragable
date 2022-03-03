@@ -386,7 +386,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
             if scrollView.contentSize == scrollView.frame.size || scrollView.contentSize.width > scrollView.frame.width {
                 return false
             }
-            if (scrollView.contentOffset.y <= 0 && scrollView.panGestureRecognizer.velocity(in: scrollView).y > 0) || (self.contentHeight < maxHeight && scrollView.panGestureRecognizer.velocity(in: scrollView).y < 0) {
+            if !self.disableGestureClose, (scrollView.contentOffset.y <= 0 && scrollView.panGestureRecognizer.velocity(in: scrollView).y > 0) || (self.contentHeight < maxHeight && scrollView.panGestureRecognizer.velocity(in: scrollView).y < 0) {
                 self.simultaneouslyScrollView = scrollView
                 return true
             }
