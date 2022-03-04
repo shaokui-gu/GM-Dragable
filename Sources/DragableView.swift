@@ -439,6 +439,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         self.initialContentHeight = min(contentHeight, maxHeight)
         UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 0.95, initialSpringVelocity: 12, options: .curveEaseInOut, animations: {
             self.contentHeight = self.initialContentHeight
+            self.layoutIfNeeded()
         }) { finished in
             self.contentView.setNeedsLayout()
         }
