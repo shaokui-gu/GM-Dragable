@@ -147,6 +147,13 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
+    /// 显示indicator
+    public var showIndicator: Bool = true {
+        didSet {
+            indicatorView.isHidden = !showIndicator
+        }
+    }
+    
     /// 当前内容高度
     public var contentHeight:CGFloat  = 462 {
         didSet {
@@ -469,7 +476,7 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     ///   - event: 事件
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let positon = touches.first?.location(in: self) ?? .zero
-        let rect = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.contentView.frame.minY - 40)
+        let rect = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.contentView.frame.minY - (indicatorView.isHidden ? 0 : 40) )
         if rect.contains(positon) {
             if self.isKeyboardShow {
                 UIApplication.shared.getFirstKeyWindow?.endEditing(true)
@@ -492,8 +499,8 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
 /// 路由相关
 public extension GM {
         
-    static func showDragableFragment(_ name:String, params:[String : Any]? = nil, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
-        try? (fromPage ?? GM.topPage())?.showDragableFragment(name, params: params, backgroundColor:backgroundColor, showShadow: showShadow, disableGestureClose: disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+    static func showDragableFragment(_ name:String, params:[String : Any]? = nil, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
+        try? (fromPage ?? GM.topPage())?.showDragableFragment(name, params: params, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose: disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
         
     static func popDragableView(from:Router.Page? = nil, isAll:Bool = true) {
@@ -507,12 +514,12 @@ public extension Router.Page {
         return self.controller?.isShowingDragableView ?? false
     }
     
-    func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
+    func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
         }
         let viewController = routePage.page(params)
-        self.controller?.showDragableFragmentControlller(destination: viewController,backgroundColor:backgroundColor, showShadow: showShadow, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+        self.controller?.showDragableFragmentControlller(destination: viewController,backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
     
     func popDragableFragment(_ isAll:Bool = true) {
@@ -521,12 +528,12 @@ public extension Router.Page {
 }
 
 public extension GMSwiftUIPageController {
-    func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
+    func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
         }
         let viewController = routePage.page(params)
-        self.uiViewController?.showDragableFragmentControlller(destination: viewController, backgroundColor:backgroundColor, showShadow: showShadow, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+        self.uiViewController?.showDragableFragmentControlller(destination: viewController, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
     
     func popDragableFragment(_ isAll:Bool = true) {
@@ -535,21 +542,21 @@ public extension GMSwiftUIPageController {
 }
 
 public extension UIViewController {
-    func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
+    func showDragableFragment(_ name:String, params:[String : Any]? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
         }
         let viewController = routePage.page(params)
-        self.showDragableFragmentControlller(destination: viewController, backgroundColor:backgroundColor, showShadow: showShadow, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+        self.showDragableFragmentControlller(destination: viewController, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
     
     @available(iOS 13.0, *)
-    func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ name:String, params:[String : Any]? = nil, contentType:Content.Type, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
+    func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ name:String, params:[String : Any]? = nil, contentType:Content.Type, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) throws -> Void {
         guard let routePage = GM.pages[name] else {
             throw Router.RouteError.init(code: Router.RouteErrorCode.notFound.rawValue, msg: Router.RouteErrorDescription.notFound.rawValue)
         }
         let viewController = routePage.page(params)
-        self.showDragableHostingFragmentControlller(destination: viewController, contentType: contentType, backgroundColor:backgroundColor, showShadow: showShadow, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+        self.showDragableHostingFragmentControlller(destination: viewController, contentType: contentType, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
 }
 
@@ -619,7 +626,7 @@ public extension UIViewController {
     /// - Parameters:
     ///   - controller: 根视图控制器
     ///   - height: 内容高度
-    func showDragableFragmentControlller(destination:UIViewController, backgroundColor:UIColor, showShadow:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
+    func showDragableFragmentControlller(destination:UIViewController, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
         guard let window = self.view.window else  {
             return
@@ -632,6 +639,7 @@ public extension UIViewController {
         dragableView.rootViewController = destination
         dragableView.showBackgroundShadow = showShadow
         dragableView.disableGestureClose = disableGestureClose
+        dragableView.showIndicator = showIndicator
         window.addSubview(dragableView)
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
@@ -651,7 +659,7 @@ public extension UIViewController {
     ///   - controller: 根视图控制器
     ///   - height: 内容高度
     @available(iOS 13.0, *)
-    func showDragableHostingFragmentControlller<Content:GMSwiftUIPageView>(destination:UIViewController, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
+    func showDragableHostingFragmentControlller<Content:GMSwiftUIPageView>(destination:UIViewController, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
         guard let window = self.view.window else  {
             return
@@ -663,6 +671,7 @@ public extension UIViewController {
         dragableView.rootViewController = destination
         dragableView.disableGestureClose = disableGestureClose
         dragableView.showBackgroundShadow = showShadow
+        dragableView.showIndicator = showIndicator
         window.addSubview(dragableView)
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
