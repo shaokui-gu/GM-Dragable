@@ -646,10 +646,6 @@ public extension UIViewController {
     ///   - height: 内容高度
     func showDragableFragmentControlller(destination:UIViewController, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
-        guard let window = self.view.window else  {
-            return
-        }
-        
         if let currentDragable = self.dragableViews.last {
             currentDragable.isHidden = true
         }
@@ -658,7 +654,7 @@ public extension UIViewController {
         dragableView.showBackgroundShadow = showShadow
         dragableView.disableGestureClose = disableGestureClose
         dragableView.showIndicator = showIndicator
-        window.addSubview(dragableView)
+        self.view.addSubview(dragableView)
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
         })
@@ -679,9 +675,6 @@ public extension UIViewController {
     @available(iOS 13.0, *)
     func showDragableHostingFragmentControlller<Content:GMSwiftUIPageView>(destination:UIViewController, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
-        guard let window = self.view.window else  {
-            return
-        }
         if let currentDragable = self.dragableViews.last {
             currentDragable.isHidden = true
         }
@@ -690,7 +683,7 @@ public extension UIViewController {
         dragableView.disableGestureClose = disableGestureClose
         dragableView.showBackgroundShadow = showShadow
         dragableView.showIndicator = showIndicator
-        window.addSubview(dragableView)
+        self.view.addSubview(dragableView)
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
         })
