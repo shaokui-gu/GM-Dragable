@@ -646,9 +646,9 @@ public extension UIViewController {
     ///   - height: 内容高度
     func showDragableFragmentControlller(destination:UIViewController, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
-        if let currentDragable = self.dragableViews.last {
-            currentDragable.isHidden = true
-        }
+//        if let currentDragable = self.dragableViews.last {
+//            currentDragable.isHidden = true
+//        }
         let dragableView = DragableView(frame: self.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         dragableView.rootViewController = destination
         dragableView.showBackgroundShadow = showShadow
