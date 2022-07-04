@@ -660,8 +660,7 @@ public extension UIViewController {
         })
         dragableView.show(height, maxHeight: maxHeight ?? self.view.bounds.size.height - self.view.safeAreaInsets.top - 26)
         dragableView.onDismiss = { [weak self] in
-            self?.removeDragable()
-            self?.showPreDragableView()
+            self?.removeDragable(isAll: false)
             onDismiss?()
         }
         dragableView.delegate = (destination as? DragableViewDelegate)
@@ -689,8 +688,7 @@ public extension UIViewController {
         })
         dragableView.show(height, maxHeight: maxHeight ?? self.view.bounds.size.height - self.view.safeAreaInsets.top - 26)
         dragableView.onDismiss = { [weak self] in
-            self?.removeDragable()
-            self?.showPreDragableView()
+            self?.removeDragable(isAll: false)
             onDismiss?()
         }
         if let navigation = destination as? UINavigationController {
