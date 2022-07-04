@@ -674,9 +674,9 @@ public extension UIViewController {
     @available(iOS 13.0, *)
     func showDragableHostingFragmentControlller<Content:GMSwiftUIPageView>(destination:UIViewController, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
-        if let currentDragable = self.dragableViews.last {
-            currentDragable.isHidden = true
-        }
+//        if let currentDragable = self.dragableViews.last {
+//            currentDragable.isHidden = true
+//        }
         let dragableView = DragableView(frame: self.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         dragableView.rootViewController = destination
         dragableView.disableGestureClose = disableGestureClose
