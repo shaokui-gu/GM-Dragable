@@ -717,11 +717,12 @@ public extension UIViewController {
     /// 清除已展示的可拖拽控件
     /// - Parameter isAll: 是否清除所有，否则只清除最后一个
     fileprivate func removeDragable(isAll:Bool = true) {
+        guard self.dragableViews.count > 0 else {
+            return
+        }
         if isAll {
-            if self.dragableViews.count > 0 {
-                self.dragableViews.forEach { dragableView in
-                    dragableView.removeFromSuperview()
-                }
+            self.dragableViews.forEach { dragableView in
+                dragableView.removeFromSuperview()
             }
             self.dragableViews.removeAll()
         } else {
