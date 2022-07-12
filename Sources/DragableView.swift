@@ -498,25 +498,6 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
 
 }
 
-
-/// 路由相关
-public extension GM {
-        
-    static func showDragableFragment(_ name:String, params:[String : Any]? = nil, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
-        try? (fromPage ?? GM.topPage())?.showDragableFragment(name, params: params, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose: disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
-    }
-        
-    @available(iOS 13.0, *)
-    static func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ name:String, params:[String : Any]? = nil, contentType:Content.Type, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
-        try? (fromPage ?? GM.topPage())?.showDragableHostingFragment(name, params: params, contentType: Content.self, backgroundColor: backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose: disableGestureClose, passthroughView: passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
-    }
-
-    
-    static func popDragableView(from:Router.Page? = nil, isAll:Bool = true) {
-        (from ?? GM.topPage())?.popDragableFragment(isAll)
-    }
-}
-
 public extension Router.Page {
     
     var isShowingDragableView:Bool {
@@ -576,14 +557,6 @@ public extension UIViewController {
         let viewController = routePage.page(params)
         self.showDragableHostingFragmentControlller(destination: viewController, contentType: contentType, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose:disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
-}
-
-public extension GM {
-    static let AppleLoginLogPrefix = "【APPLE LOGIN】:"
-    static let ApnsLogPrefix = "【APNS】:"
-    static let CalendarLogPrefix = "【CALENDAR】:"
-    static let MqttLogPrefix = "【MQTT】:"
-    static let TracingLogPrefix = "【TRACKING EVENT】:"
 }
 
 public extension DragableView {
@@ -658,6 +631,7 @@ public extension UIViewController {
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
         })
+        destination.isDragable = true
         dragableView.show(height, maxHeight: maxHeight ?? self.view.bounds.size.height - self.view.safeAreaInsets.top - 26)
         dragableView.onDismiss = { [weak self] in
             self?.removeDragable(isAll: false)
@@ -686,17 +660,21 @@ public extension UIViewController {
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
         })
+        if let navigation = destination as? UINavigationController {
+            let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
+            page.isDragable = true
+            page.rootView.observedController?.isDragable = true
+            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
+        } else {
+            let page = destination as! GMSwiftUIPage<Content>
+            page.isDragable = true
+            page.rootView.observedController?.isDragable = true
+            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
+        }
         dragableView.show(height, maxHeight: maxHeight ?? self.view.bounds.size.height - self.view.safeAreaInsets.top - 26)
         dragableView.onDismiss = { [weak self] in
             self?.removeDragable(isAll: false)
             onDismiss?()
-        }
-        if let navigation = destination as? UINavigationController {
-            let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
-            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
-        } else {
-            let page = destination as! GMSwiftUIPage<Content>
-            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
         }
         self.dragableViews.append(dragableView)
     }
@@ -746,4 +724,66 @@ public extension UIViewController {
     }
     */
 
+}
+
+public extension UIViewController {
+    private struct DragableKeys {
+        static var isDragableKey = "isDragableView"
+    }
+    
+    var isDragable:Bool {
+        set {
+            objc_setAssociatedObject(self, &DragableKeys.isDragableKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+        get {
+            return (objc_getAssociatedObject(self, &DragableKeys.isDragableKey) as? Bool) ?? false
+        }
+    }
+}
+
+
+public extension GMSwiftUIPageController {
+    
+    private struct DragableKeys {
+        static var isDragableKey = "isDragableView"
+    }
+    
+    var isDragable:Bool {
+        set {
+            objc_setAssociatedObject(self, &DragableKeys.isDragableKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+        get {
+            return (objc_getAssociatedObject(self, &DragableKeys.isDragableKey) as? Bool) ?? false
+        }
+    }
+}
+
+
+
+public extension GM {
+    static let AppleLoginLogPrefix = "【APPLE LOGIN】:"
+    static let ApnsLogPrefix = "【APNS】:"
+    static let CalendarLogPrefix = "【CALENDAR】:"
+    static let MqttLogPrefix = "【MQTT】:"
+    static let TracingLogPrefix = "【TRACKING EVENT】:"
+}
+
+
+
+/// 路由相关
+public extension GM {
+        
+    static func showDragableFragment(_ name:String, params:[String : Any]? = nil, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
+        try? (fromPage ?? GM.topPage())?.showDragableFragment(name, params: params, backgroundColor:backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose: disableGestureClose, passthroughView:passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+    }
+        
+    @available(iOS 13.0, *)
+    static func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ name:String, params:[String : Any]? = nil, contentType:Content.Type, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
+        try? (fromPage ?? GM.topPage())?.showDragableHostingFragment(name, params: params, contentType: Content.self, backgroundColor: backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose: disableGestureClose, passthroughView: passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
+    }
+
+    
+    static func popDragableView(from:Router.Page? = nil, isAll:Bool = true) {
+        (from ?? GM.topPage())?.popDragableFragment(isAll)
+    }
 }
