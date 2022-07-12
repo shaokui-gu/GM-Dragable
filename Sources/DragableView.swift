@@ -651,27 +651,22 @@ public extension UIViewController {
 //        if let currentDragable = self.dragableViews.last {
 //            currentDragable.isHidden = true
 //        }
+        let dragableView = DragableView(frame: self.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         destination.isDragable = true
         if let navigation = destination as? UINavigationController {
             let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
             page.isDragable = true
             page.rootView.observedController?.isDragable = true
+            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
         } else {
             let page = destination as! GMSwiftUIPage<Content>
             page.rootView.observedController?.isDragable = true
+            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
         }
-        let dragableView = DragableView(frame: self.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         dragableView.rootViewController = destination
         dragableView.disableGestureClose = disableGestureClose
         dragableView.showBackgroundShadow = showShadow
         dragableView.showIndicator = showIndicator
-        if let navigation = destination as? UINavigationController {
-            let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
-            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
-        } else {
-            let page = destination as! GMSwiftUIPage<Content>
-            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
-        }
         self.view.addSubview(dragableView)
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
