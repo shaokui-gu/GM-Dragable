@@ -622,6 +622,7 @@ public extension UIViewController {
 //        if let currentDragable = self.dragableViews.last {
 //            currentDragable.isHidden = true
 //        }
+        destination.isDragable = true
         let dragableView = DragableView(frame: self.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         dragableView.rootViewController = destination
         dragableView.showBackgroundShadow = showShadow
@@ -631,7 +632,6 @@ public extension UIViewController {
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
         })
-        destination.isDragable = true
         dragableView.show(height, maxHeight: maxHeight ?? self.view.bounds.size.height - self.view.safeAreaInsets.top - 26)
         dragableView.onDismiss = { [weak self] in
             self?.removeDragable(isAll: false)
@@ -651,26 +651,31 @@ public extension UIViewController {
 //        if let currentDragable = self.dragableViews.last {
 //            currentDragable.isHidden = true
 //        }
+        destination.isDragable = true
+        if let navigation = destination as? UINavigationController {
+            let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
+            page.isDragable = true
+            page.rootView.observedController?.isDragable = true
+        } else {
+            let page = destination as! GMSwiftUIPage<Content>
+            page.rootView.observedController?.isDragable = true
+        }
         let dragableView = DragableView(frame: self.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         dragableView.rootViewController = destination
         dragableView.disableGestureClose = disableGestureClose
         dragableView.showBackgroundShadow = showShadow
         dragableView.showIndicator = showIndicator
+        if let navigation = destination as? UINavigationController {
+            let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
+            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
+        } else {
+            let page = destination as! GMSwiftUIPage<Content>
+            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
+        }
         self.view.addSubview(dragableView)
         dragableView.snp.makeConstraints({ maker in
             maker.edges.equalTo(UIEdgeInsets.zero)
         })
-        if let navigation = destination as? UINavigationController {
-            let page = navigation.viewControllers.first! as! GMSwiftUIPage<Content>
-            page.isDragable = true
-            page.rootView.observedController?.isDragable = true
-            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
-        } else {
-            let page = destination as! GMSwiftUIPage<Content>
-            page.isDragable = true
-            page.rootView.observedController?.isDragable = true
-            dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
-        }
         dragableView.show(height, maxHeight: maxHeight ?? self.view.bounds.size.height - self.view.safeAreaInsets.top - 26)
         dragableView.onDismiss = { [weak self] in
             self?.removeDragable(isAll: false)
