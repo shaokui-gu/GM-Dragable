@@ -101,7 +101,11 @@ open class DragableView: UIView, UIGestureRecognizerDelegate {
     private var keyboardHeight:CGFloat = 0
 
     /// 不允许手势关闭
-    public var disableGestureClose:Bool = false
+    public var disableGestureClose:Bool = false {
+        didSet {
+            self.dragEnabled = !disableGestureClose
+        }
+    }
     
     /// 发生手势冲突的scrollView
     private var simultaneouslyScrollView:UIScrollView? = nil
