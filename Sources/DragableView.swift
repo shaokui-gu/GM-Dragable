@@ -795,10 +795,10 @@ public extension GM {
 //        if let currentDragable = self.dragableViews.last {
 //            currentDragable.isHidden = true
 //        }
-        let destination = UIHostingController(rootView: fragment)
+        let destination = GMSwiftUIPage(rootView: fragment)
         let dragableView = DragableView(frame: currentViewController.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         destination.isDragable = true
-        let page = destination as! GMSwiftUIPage<Content>
+        let page = destination
         page.rootView.observedController?.isDragable = true
         dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
         dragableView.rootViewController = destination
