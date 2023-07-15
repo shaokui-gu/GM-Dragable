@@ -796,6 +796,7 @@ public extension GM {
 //            currentDragable.isHidden = true
 //        }
         let destination = GMSwiftUIPage(rootView: fragment)
+        destination.view.backgroundColor = .clear
         let dragableView = DragableView(frame: currentViewController.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
         destination.isDragable = true
         let page = destination
