@@ -785,6 +785,37 @@ public extension GM {
     static func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ name:String, params:[String : Any]? = nil, contentType:Content.Type, fromPage:Router.Page? = nil, backgroundColor:UIColor = UIColor.init(white: 0, alpha: 0.5), showShadow:Bool = false, showIndicator:Bool = true, disableGestureClose:Bool = false, passthroughView:UIView? = nil, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss:VoidCallBack? = nil) {
         try? (fromPage ?? GM.topPage())?.showDragableHostingFragment(name, params: params, contentType: Content.self, backgroundColor: backgroundColor, showShadow: showShadow, showIndicator: showIndicator, disableGestureClose: disableGestureClose, passthroughView: passthroughView, height: height, maxHeight: maxHeight, onDismiss: onDismiss)
     }
+    
+    @available(iOS 13.0, *)
+    func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ fragment:Content, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
+        
+        guard let currentViewController = GM.topPage()?.controller else {
+            return
+        }
+//        if let currentDragable = self.dragableViews.last {
+//            currentDragable.isHidden = true
+//        }
+        let destination = UIHostingController(rootView: fragment)
+        let dragableView = DragableView(frame: currentViewController.view.bounds, backgroundColor: backgroundColor, passthroughView: passthroughView)
+        destination.isDragable = true
+        let page = destination as! GMSwiftUIPage<Content>
+        page.rootView.observedController?.isDragable = true
+        dragableView.delegate = (page.rootView.observedController as? DragableViewDelegate)
+        dragableView.rootViewController = destination
+        dragableView.disableGestureClose = disableGestureClose
+        dragableView.showBackgroundShadow = showShadow
+        dragableView.showIndicator = showIndicator
+        currentViewController.view.addSubview(dragableView)
+        dragableView.snp.makeConstraints({ maker in
+            maker.edges.equalTo(UIEdgeInsets.zero)
+        })
+        dragableView.show(height, maxHeight: maxHeight ?? currentViewController.view.bounds.size.height - currentViewController.view.safeAreaInsets.top - 26)
+        dragableView.onDismiss = { [weak currentViewController] in
+            currentViewController?.removeDragable(isAll: false)
+            onDismiss?()
+        }
+        currentViewController.dragableViews.append(dragableView)
+    }
 
     
     static func popDragableView(from:Router.Page? = nil, isAll:Bool = true) {
