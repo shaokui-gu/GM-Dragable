@@ -787,7 +787,7 @@ public extension GM {
     }
     
     @available(iOS 13.0, *)
-    func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ fragment:Content, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
+    static func showDragableHostingFragment<Content:GMSwiftUIPageView>(_ fragment:Content, contentType:Content.Type, backgroundColor:UIColor, showShadow:Bool, showIndicator:Bool, disableGestureClose:Bool = false, passthroughView:UIView?, height:CGFloat = GM.windowSize.height * 0.5, maxHeight:CGFloat? = nil, onDismiss: VoidCallBack?) {
         
         guard let currentViewController = GM.topPage()?.controller else {
             return
